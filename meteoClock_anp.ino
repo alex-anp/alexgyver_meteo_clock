@@ -51,7 +51,13 @@
 
 #define BL_START 7
 #define BL_STOP 1
+
+// Яркость подсветки
+int BL_HIGHT = 255; // день 
+int BL_LOW   = 50;  // в ночном режиме
+// Стостояние подсветки включено/выключено
 boolean BL_SW_STATUS = true;
+
 
 // адрес BME280 жёстко задан в файле библиотеки Adafruit_BME280.h
 // стоковый адрес был 0x77, у китайского модуля адрес 0x76.
@@ -66,9 +72,11 @@ boolean BL_SW_STATUS = true;
 #define LED_COM 7
 #define LED_R 9
 #define LED_G 6
-#define LED_B 5
+#define LED_B 10
 
 #define BTN_PIN 4
+
+#define BL_PIN 5 // BackLight PWM Pin
 
 // библиотеки
 #include <Wire.h>
@@ -456,7 +464,7 @@ void drawClock(byte hours, byte minutes, byte x, byte y, boolean dotState) {
     if (BL_START <= hours && hours < BL_STOP) BL_SW_STATUS = true;
       else BL_SW_STATUS = false;  
   #endif
-  lcd.setBacklight(BL_SW_STATUS);
+  setBL();
  
 }
 
@@ -608,12 +616,16 @@ void setup() {
   pinMode(LED_B, OUTPUT);
   setLED(0);
 
+  // Инициализируем пин подсветки
+  pinMode(BL_PIN, OUTPUT);
+  // Включаем подсветку
+  setBL();
+
   digitalWrite(LED_COM, LED_MODE);
 
   lcd.init();
   lcd.backlight();
   lcd.clear();
-
   
 
 #if (DEBUG == 1 && DISPLAY_TYPE == 1)

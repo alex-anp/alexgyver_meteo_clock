@@ -41,9 +41,16 @@ void modesTick() {
 }
 
 void switchBacklight() {
-
-  lcd.setBacklight(BL_SW_STATUS = !BL_SW_STATUS);
+  BL_SW_STATUS = !BL_SW_STATUS;
+  setBL();
   
+}
+
+void setBL() {
+  if (BL_SW_STATUS) 
+    analogWrite(BL_PIN, BL_HIGHT); 
+  else 
+    analogWrite(BL_PIN, BL_LOW);
 }
 
 void redrawPlot() {
