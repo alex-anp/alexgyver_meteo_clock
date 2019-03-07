@@ -1,6 +1,6 @@
 # AlexGyver Meteo Clock
 
-Доработка прошивки для Часов с метео датчиками по проекту AlexGyver.
+Доработка прошивки для Часов с метео датчиками, по проекту AlexGyver.
 
 Ссылка на родительский проект - https://github.com/AlexGyver/MeteoClock
 
