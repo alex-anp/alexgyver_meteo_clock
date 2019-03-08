@@ -733,6 +733,29 @@ void setup() {
 }
 
 void loop() {
+  // Настройка часов через компорт
+  if (Serial.available() > 0) {
+      String buf_txt = Serial.readString();
+      
+      now = rtc.now();
+      
+      if (buf_txt.substring(0,1) == "H"){
+        hrs = buf_txt.substring(1,3).toInt();
+        Serial.println("Set Hours -> " + hrs);
+        rtc.adjust(DateTime(now.year(), now.month(), now.day(), hrs, now.minute(), now.second()));
+        drawClock(hrs, mins, 0, 1, 1);
+      }
+
+      if (buf_txt.substring(0,1) == "M"){
+        mins = buf_txt.substring(1,3).toInt();
+        Serial.println("Set Minute -> "+buf_txt.substring(1,3));
+        rtc.adjust(DateTime(now.year(), now.month(), now.day(), now.hour(), mins, now.second()));
+        drawClock(hrs, mins, 0, 1, 1);
+      }
+
+  }
+
+  
   if (sensorsTimer.isReady()) readSensors();    // читаем показания датчиков с периодом SENS_TIME
 
 #if (DISPLAY_TYPE == 1)
