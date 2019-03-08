@@ -53,8 +53,8 @@
 #define BL_STOP 1
 
 // Яркость подсветки
-int BL_HIGHT = 255; // день 
-int BL_LOW   = 50;  // в ночном режиме
+int BL_HIGHT = 150; // день 
+int BL_LOW   = 20;  // в ночном режиме
 // Стостояние подсветки включено/выключено
 boolean BL_SW_STATUS = true;
 
