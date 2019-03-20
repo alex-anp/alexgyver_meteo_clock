@@ -51,7 +51,7 @@
 
 // Часы включения и выключения подсветки
 #define BL_START 7 // включится в 07:00 утром
-#define BL_STOP 1 // выключится в 01:00 ночью
+#define BL_STOP 0 // выключится в 01:00 ночью
 
 // Яркость подсветки (255 ваксимум, 0 минимум)
 int BL_HIGHT = 150; // день 
@@ -149,326 +149,6 @@ uint32_t sumX, sumY, sumX2, sumXY;
 float a, b;
 byte time_array[6];
 
-// символы
-// график
-byte row8[8] = {
-  0b11111,
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11111
-};
-byte row7[8] = {
-  0b00000,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11111
-};
-byte row6[8] = {
-  0b00000,  
-  0b00000,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11111
-};
-byte row5[8] = {
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11111
-};
-byte row4[8] = {
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11111
-};
-byte row3[8] = {
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b11111,  
-  0b11111,  
-  0b11111
-};
-byte row2[8] = {
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b11111,  
-  0b11111
-};
-byte row1[8] = {
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b11111
-};
-
-// цифры
-//0
-uint8_t LT[8] = {
-  0b00111,  
-  0b01111,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b01111
-};
-//1
-uint8_t UB[8] = {
-  0b11111,  
-  0b11111,  
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b00000
-};
-//2
-uint8_t RT[8] = {
-  0b11100,  
-  0b11110,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11110
-};
-//3
-uint8_t LL[8] = {
-  0b01111,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b01111,  
-  0b00111
-};
-//4
-uint8_t LB[8] = {
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b11111,  
-  0b11111
-};
-//5
-uint8_t LR[8] = {
-  0b11110,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11111,  
-  0b11110,  
-  0b11100
-};
-//6
-uint8_t UMB[8] = {
-  0b11111,  
-  0b11111,  
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b11111
-};
-//7
-uint8_t LMB[8] = {
-  0b11111,  
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b00000,  
-  0b11111,  
-  0b11111
-};
-
-void drawDig(byte dig, byte x, byte y) {
-  switch (dig) {
-    case 0:
-      lcd.setCursor(x, y); // set cursor to column 0, line 0 (first row)
-      lcd.write(0);  // call each segment to create
-      lcd.write(1);  // top half of the number
-      lcd.write(2);
-      lcd.setCursor(x, y + 1); // set cursor to colum 0, line 1 (second row)
-      lcd.write(3);  // call each segment to create
-      lcd.write(4);  // bottom half of the number
-      lcd.write(5);
-      break;
-    case 1:
-      lcd.setCursor(x+2, y);
-      //lcd.write(1);
-      lcd.write(0);
-      lcd.setCursor(x + 2, y + 1);
-      lcd.write(5);
-      break;
-    case 2:
-      lcd.setCursor(x, y);
-      lcd.write(1);
-      lcd.write(6);
-      lcd.write(2);
-      lcd.setCursor(x, y + 1);
-      lcd.write(0);
-      lcd.write(7);
-      lcd.write(4);
-      break;
-    case 3:
-      lcd.setCursor(x, y);
-      lcd.write(1);
-      lcd.write(6);
-      lcd.write(5);
-      lcd.setCursor(x, y + 1);
-      lcd.write(4);
-      lcd.write(7);
-      lcd.write(5);
-      break;
-    case 4:
-      lcd.setCursor(x, y);
-      lcd.write(0);
-      lcd.write(4);
-      lcd.write(2);
-      lcd.setCursor(x + 2, y + 1);
-      lcd.write(5);
-      break;
-    case 5:
-      lcd.setCursor(x, y);
-      lcd.write(3);
-      lcd.write(6);
-      lcd.write(1);
-      lcd.setCursor(x, y + 1);
-      lcd.write(4);
-      lcd.write(7);
-      lcd.write(5);
-      break;
-    case 6:
-      lcd.setCursor(x, y);
-      lcd.write(0);
-      lcd.write(6);
-      //lcd.write(1);
-      lcd.setCursor(x, y + 1);
-      lcd.write(3);
-      lcd.write(7);
-      lcd.write(5);
-      break;
-    case 7:
-      lcd.setCursor(x, y);
-      lcd.write(1);
-      lcd.write(1);
-      lcd.write(5);
-      lcd.setCursor(x + 1, y + 1);
-      lcd.write(0);
-      break;
-    case 8:
-      lcd.setCursor(x, y);
-      lcd.write(3);
-      lcd.write(6);
-      lcd.write(5);
-      lcd.setCursor(x, y + 1);
-      lcd.write(0);
-      lcd.write(7);
-      lcd.write(2);
-      break;
-    case 9:
-      lcd.setCursor(x, y);
-      lcd.write(0);
-      lcd.write(6);
-      lcd.write(2);
-      lcd.setCursor(x+1, y + 1);
-      lcd.write(4);
-      lcd.write(5);
-      break;
-    case 10:
-      lcd.setCursor(x, y);
-      lcd.write(32);
-      lcd.write(32);
-      lcd.write(32);
-      lcd.setCursor(x, y + 1);
-      lcd.write(32);
-      lcd.write(32);
-      lcd.write(32);
-      break;
-  }
-}
-
-void drawdots(byte x, byte y, boolean state) {
-  byte code;
-  if (state) code = 165;
-  else code = 32;
-  lcd.setCursor(x, y);
-  lcd.write(code);
-  lcd.setCursor(x, y + 1);
-  lcd.write(code);
-}
-
-void drawClock(byte hours, byte minutes, byte x, byte y, boolean dotState) {
-  // чисти чисти!
-  lcd.setCursor(x, y);
-  lcd.print("               ");
-  lcd.setCursor(x, y + 1);
-  lcd.print("               ");
-
-  //if (hours > 23 || minutes > 59) return;
-  if (hours / 10 == 0) 
-    drawDig(10, x, y);
-  else 
-    drawDig(hours / 10, x, y);
-   
-  drawDig(hours % 10, x + 4, y);
-  // тут должны быть точки. Отдельной функцией
-  drawDig(minutes / 10, x + 8, y);
-  drawDig(minutes % 10, x + 12, y);
-  
-  // Управление подсветкой
-  // Для сов, которые засыпают после полудни
-  #if (BL_STOP < BL_START)
-    if (BL_STOP <= hours && hours < BL_START) BL_SW_STATUS = false; 
-      else BL_SW_STATUS = true;
-  #else
-    if (BL_START <= hours && hours < BL_STOP) BL_SW_STATUS = true;
-      else BL_SW_STATUS = false;  
-  #endif
-  setBL();
- 
-}
 
 #if (WEEK_LANG == 0)
 static const char *dayNames[]  = {
@@ -492,122 +172,11 @@ static const char *dayNames[]  = {
 };
 #endif
 
-void drawData() {
-  lcd.setCursor(15, 1);
-  if (now.day() < 10) lcd.print(0);
-  lcd.print(now.day());
-  lcd.print(".");
-  if (now.month() < 10) lcd.print(0);
-  lcd.print(now.month());
-
-  if (DISP_MODE == 0) {
-    lcd.setCursor(16, 2);
-    lcd.print(now.year());
-  } else if (DISP_MODE == 1) {
-    lcd.setCursor(16, 2);
-    int dayofweek = now.dayOfTheWeek();
-    lcd.print(dayNames[dayofweek]);
-  }
-}
-
-void drawPlot(byte pos, byte row, byte width, byte height, int min_val, int max_val, int *plot_array, String label) {
-  int max_value = -32000;
-  int min_value = 32000;
-
-  for (byte i = 0; i < 15; i++) {
-    if (plot_array[i] > max_value) max_value = plot_array[i];
-    if (plot_array[i] < min_value) min_value = plot_array[i];
-  }
-  lcd.setCursor(16, 0); lcd.print(max_value);
-  lcd.setCursor(16, 1); lcd.print(label);
-  lcd.setCursor(16, 2); lcd.print(plot_array[14]);
-  lcd.setCursor(16, 3); lcd.print(min_value);
-
-  for (byte i = 0; i < width; i++) {                  // каждый столбец параметров
-    int fill_val = plot_array[i];
-    fill_val = constrain(fill_val, min_val, max_val);
-    byte infill, fract;
-    // найти количество целых блоков с учётом минимума и максимума для отображения на графике
-    if (plot_array[i] > min_val)
-      infill = floor((float)(plot_array[i] - min_val) / (max_val - min_val) * height * 10);
-    else infill = 0;
-    fract = (float)(infill % 10) * 8 / 10;                   // найти количество оставшихся полосок
-    infill = infill / 10;
-
-    for (byte n = 0; n < height; n++) {     // для всех строк графика
-      if (n < infill && infill > 0) {       // пока мы ниже уровня
-        lcd.setCursor(i, (row - n));        // заполняем полными ячейками
-        lcd.write(0);
-      }
-      if (n >= infill) {                    // если достигли уровня
-        lcd.setCursor(i, (row - n));
-        if (fract > 0) lcd.write(fract);          // заполняем дробные ячейки
-        else lcd.write(16);                       // если дробные == 0, заливаем пустой
-        for (byte k = n + 1; k < height; k++) {   // всё что сверху заливаем пустыми
-          lcd.setCursor(i, (row - k));
-          lcd.write(16);
-        }
-        break;
-      }
-    }
-  }
-}
-
-void loadClock() {
-  lcd.createChar(0, LT);
-  lcd.createChar(1, UB);
-  lcd.createChar(2, RT);
-  lcd.createChar(3, LL);
-  lcd.createChar(4, LB);
-  lcd.createChar(5, LR);
-  lcd.createChar(6, UMB);
-  lcd.createChar(7, LMB);
-}
-
-void loadPlot() {
-  lcd.createChar(0, row8);
-  lcd.createChar(1, row1);
-  lcd.createChar(2, row2);
-  lcd.createChar(3, row3);
-  lcd.createChar(4, row4);
-  lcd.createChar(5, row5);
-  lcd.createChar(6, row6);
-  lcd.createChar(7, row7);
-}
-
 #if (LED_MODE == 0)
 #define LED_ON (LED_BRIGHT)
 #else
 #define LED_ON (255 - LED_BRIGHT)
 #endif
-
-void setLED(byte color) {
-  // сначала всё выключаем
-  if (!LED_MODE) {
-    analogWrite(LED_R, 0);
-    analogWrite(LED_G, 0);
-    analogWrite(LED_B, 0);
-  } else {
-    analogWrite(LED_R, 255);
-    analogWrite(LED_G, 255);
-    analogWrite(LED_B, 255);
-  }
-  switch (color) {    // 0 выкл, 1 красный, 2 зелёный, 3 синий (или жёлтый)
-    case 0:
-      break;
-    case 1: analogWrite(LED_R, LED_ON);
-      break;
-    case 2: analogWrite(LED_G, LED_ON);
-      break;
-    case 3:
-      if (!BLUE_YELLOW) analogWrite(LED_B, LED_ON);
-      else {
-        analogWrite(LED_R, LED_ON - 50);    // чутка уменьшаем красный
-        analogWrite(LED_G, LED_ON);
-      }
-      break;
-  }
-}
 
 void setup() {
   Serial.begin(9600);
@@ -727,7 +296,7 @@ void setup() {
 
   if (DISPLAY_TYPE == 1) {
     loadClock();
-    drawClock(hrs, mins, 0, 1, 1);
+    drawClock(hrs, mins, 0, 0, 1);
     drawData();
   }
   readSensors();
@@ -745,14 +314,14 @@ void loop() {
         hrs = buf_txt.substring(1,3).toInt();
         Serial.println("Set Hours -> " + hrs);
         rtc.adjust(DateTime(now.year(), now.month(), now.day(), hrs, now.minute(), now.second()));
-        drawClock(hrs, mins, 0, 1, 1);
+        drawClock(hrs, mins, 0, 0, 1);
       }
 
       if (buf_txt.substring(0,1) == "M"){
         mins = buf_txt.substring(1,3).toInt();
         Serial.println("Set Minute -> "+buf_txt.substring(1,3));
         rtc.adjust(DateTime(now.year(), now.month(), now.day(), now.hour(), mins, now.second()));
-        drawClock(hrs, mins, 0, 1, 1);
+        drawClock(hrs, mins, 0, 0, 1);
       }
 
   }
