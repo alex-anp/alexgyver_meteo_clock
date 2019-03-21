@@ -148,7 +148,7 @@ uint32_t pressure_array[6];
 uint32_t sumX, sumY, sumX2, sumXY;
 float a, b;
 byte time_array[6];
-
+int digs[4] = {10,10,10,10};
 
 #if (WEEK_LANG == 0)
 static const char *dayNames[]  = {
@@ -336,7 +336,10 @@ void loop() {
   if (mode == 0) {                                  // в режиме "главного экрана"
     if (drawSensorsTimer.isReady()) drawSensors();  // обновляем показания датчиков на дисплее с периодом SENS_TIME
   } else {                                          // в любом из графиков
-    if (plotTimer.isReady()) redrawPlot();          // перерисовываем график
+    if (plotTimer.isReady()) {
+      redrawPlot();          // перерисовываем график
+    }
+    for (int i = 0; i<4; i++) digs[i] = 10;
   }
 #else
   if (drawSensorsTimer.isReady()) drawSensors();

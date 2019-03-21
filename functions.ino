@@ -185,15 +185,26 @@ void drawClock(byte hours, byte minutes, byte x, byte y, boolean dotState) {
   //lcd.print("               ");
 
   //if (hours > 23 || minutes > 59) return;
-  if (hours / 10 == 0) 
-    drawDig(10, x, y);
-  else 
-    drawDig(hours / 10, x, y);
-   
-  drawDig(hours % 10, x + 4, y);
+  if (hours / 10 == 1 && hours / 10 != digs[0]) {
+      drawDig(hours / 10, x, y);
+      digs[0] = hours / 10;
+  } else {
+    clearDig(x, y);
+  }
+  
+  if (hours % 10 != digs[1]) {
+    drawDig(hours % 10, x + 4, y);
+    digs[1] = hours % 10;
+  }
   // тут должны быть точки. Отдельной функцией
-  drawDig(minutes / 10, x + 8, y);
-  drawDig(minutes % 10, x + 12, y);
+  if (minutes / 10 != digs[2]) {
+    drawDig(minutes / 10, x + 8, y);
+    digs[2] = minutes / 10;
+  }
+  if (minutes % 10 != digs[3]) {
+    drawDig(minutes % 10, x + 12, y);
+    digs[3] = minutes % 10;
+  }
   
   // Управление подсветкой
   // Для сов, которые засыпают после полудни
