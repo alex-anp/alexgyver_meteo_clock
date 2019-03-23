@@ -53,6 +53,11 @@
 #define BL_START 7 // включится в 07:00 утром
 #define BL_STOP 0 // выключится в 01:00 ночью
 
+// Положение и шаг часов
+#define CLOCK_X 0
+#define CLOCK_Y 0
+#define CLOCK_S 4
+
 // Яркость подсветки (255 ваксимум, 0 минимум)
 int BL_HIGHT = 150; // день 
 int BL_LOW   = 20;  // в ночном режиме
@@ -111,7 +116,8 @@ GTimer_ms clockTimer(500);
 GTimer_ms hourPlotTimer((long)4 * 60 * 1000);         // 4 минуты
 GTimer_ms dayPlotTimer((long)1.6 * 60 * 60 * 1000);   // 1.6 часа
 GTimer_ms plotTimer(240000);
-GTimer_ms predictTimer((long)10 * 60 * 1000);         // 10 минут
+GTimer_ms predictTimer((long) 10 * 60 * 1000);         // 10 минут
+GTimer_ms multTimer(90); // Таймер анимации смены цифр времени       
 
 #include "GyverButton.h"
 GButton button(BTN_PIN, LOW_PULL, NORM_OPEN);
@@ -137,6 +143,13 @@ int dispPres;
 int dispCO2;
 int dispRain;
 
+// Переменные для анимации смены цифр времени
+byte mult_dig_x = 0;  // Координаты отрисовываемой цифры
+byte mult_dig_y = 0;
+byte mult_x = 0;  // Координаты обновляемого элемента цифры
+byte mult_y = 0;
+boolean mult_progress; // Признак что идет анимация смены цыфры
+boolean dig_clear; // Признак что предыдущая цифра полностью стерлась
 
 // массивы графиков
 int tempHour[15], tempDay[15];
@@ -148,7 +161,10 @@ uint32_t pressure_array[6];
 uint32_t sumX, sumY, sumX2, sumXY;
 float a, b;
 byte time_array[6];
-int digs[4] = {10,10,10,10};
+
+// Масивы для храниения значений цифр вреиени
+byte digs[4] = {10,10,10,10}; // Текущее значение
+byte new_digs[4] = {10,10,10,10}; // Новые значения
 
 #if (WEEK_LANG == 0)
 static const char *dayNames[]  = {
@@ -296,7 +312,7 @@ void setup() {
 
   if (DISPLAY_TYPE == 1) {
     loadClock();
-    drawClock(hrs, mins, 0, 0, 1);
+    updateClock(hrs, mins, CLOCK_X, CLOCK_Y, 1);
     drawData();
   }
   readSensors();
@@ -314,22 +330,25 @@ void loop() {
         hrs = buf_txt.substring(1,3).toInt();
         Serial.println("Set Hours -> " + hrs);
         rtc.adjust(DateTime(now.year(), now.month(), now.day(), hrs, now.minute(), now.second()));
-        drawClock(hrs, mins, 0, 0, 1);
+        updateClock(hrs, mins, CLOCK_X, CLOCK_Y, 1);
       }
 
       if (buf_txt.substring(0,1) == "M"){
         mins = buf_txt.substring(1,3).toInt();
         Serial.println("Set Minute -> "+buf_txt.substring(1,3));
         rtc.adjust(DateTime(now.year(), now.month(), now.day(), now.hour(), mins, now.second()));
-        drawClock(hrs, mins, 0, 0, 1);
+        updateClock(hrs, mins, CLOCK_X, CLOCK_Y, 1);
       }
 
   }
 
-  
+    
   if (sensorsTimer.isReady()) readSensors();    // читаем показания датчиков с периодом SENS_TIME
 
 #if (DISPLAY_TYPE == 1)
+  
+  if (mult_progress && multTimer.isReady()) multDig(); // Анимация смены цифр времени если требуется
+  
   if (clockTimer.isReady()) clockTick();        // два раза в секунду пересчитываем время и мигаем точками
   plotSensorsTick();                            // тут внутри несколько таймеров для пересчёта графиков (за час, за день и прогноз)
   modesTick();                                  // тут ловим нажатия на кнопку и переключаем режимы

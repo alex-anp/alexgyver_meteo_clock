@@ -29,7 +29,7 @@ void modesTick() {
     if (mode == 0) {
       lcd.clear();
       loadClock();
-      drawClock(hrs, mins, 0, 0, 1);
+      updateClock(hrs, mins, CLOCK_X, CLOCK_Y, 1);
       if (DISPLAY_TYPE == 1) drawData();
       drawSensors();
     } else {
@@ -53,23 +53,54 @@ void setBL() {
     analogWrite(BL_PIN, BL_LOW);
 }
 
-void clearDig(byte x, byte y){
-  //lcd.cursor_on();
-  //lcd.createChar(0, row8);
-  for (int j=0; j<2; j++){
+void multDig(){
+  
+  byte dig_i = 255; // Индекс обновляемой цифры, 255 чтобы не 0
 
-    for (int i=0; i<3; i++){
-        lcd.setCursor(x+i, y+j);
-        lcd.print(' ');
-        delay(50);
+  // Ищем изменившиюся цифру
+  for (byte i=0; i<4; i++){
+    
+    if (digs[i] != new_digs[i]){
+      dig_i = i;            // Берем первую найденную
+      mult_progress = true; // запускаем анимацию
+      break;                // и выходим из цикла
     }
+    mult_progress = false;  // Все цифры обновились, останавливаем анимацию
   }
-  //lcd.cursor_off();
-  //lcd.createChar(0, LT);
-}
-void drawDig(byte dig, byte x, byte y) {
 
-  clearDig(x, y);
+  if (mult_progress){
+    // вычисляем координаты смкнившейся цмфры
+    mult_dig_x = CLOCK_X + CLOCK_S * dig_i;
+    mult_dig_y = CLOCK_Y;  
+    // Стираем первый элемент цифры
+    lcd.setCursor(mult_dig_x + mult_x, mult_dig_y + mult_y);
+    lcd.print(' ');
+    // смешаемся по Х
+    mult_x++;
+    
+    if (mult_x == 3){ // если дошли до конца первлй строки смещаемся на вторую
+      mult_x = 0;
+      mult_y++;
+    }
+    
+    if (mult_y == 2 ){  // дошли до конца вторй строки, обнуляемся
+      mult_x = 0;
+      mult_y = 0;
+      dig_clear = true;
+    }
+    
+    // Все стерли, рисуем новый
+    if (dig_clear){
+      drawDig(new_digs[dig_i], mult_dig_x, mult_dig_y);
+      digs[dig_i] = new_digs[dig_i];
+      
+      dig_clear = false;  // обнуляем признак очищенной цифры
+    }    
+  }
+  
+}
+
+void drawDig(byte dig, byte x, byte y) {
   
   switch (dig) {
     case 0:
@@ -177,33 +208,32 @@ void drawDig(byte dig, byte x, byte y) {
   }
 }
 
-void drawClock(byte hours, byte minutes, byte x, byte y, boolean dotState) {
-  // чисти чисти!
-  //lcd.setCursor(x, y);
-  //lcd.print("               ");
-  //lcd.setCursor(x, y + 1);
-  //lcd.print("               ");
-
-  //if (hours > 23 || minutes > 59) return;
-  if (hours / 10 == 1 && hours / 10 != digs[0]) {
-      drawDig(hours / 10, x, y);
-      digs[0] = hours / 10;
-  } else {
-    clearDig(x, y);
+void updateClock(byte hours, byte minutes, byte x, byte y, boolean dotState) {
+  // Функция обновления цифры времени
+  // Ничего не рисует, только обновляет массив новых значений
+  
+  // Рисуем Час
+  if (hours / 10 != digs[0]) {
+    if (hours / 10 > 0) {
+      new_digs[0] = hours / 10;
+    } else {
+      new_digs[0] = 10;
+    }
+    mult_progress = true;
+  }
+  if (hours % 10 != digs[1]) {
+    new_digs[1] = hours % 10;
+    mult_progress = true;
   }
   
-  if (hours % 10 != digs[1]) {
-    drawDig(hours % 10, x + 4, y);
-    digs[1] = hours % 10;
-  }
-  // тут должны быть точки. Отдельной функцией
+  // Рисуем Минуты
   if (minutes / 10 != digs[2]) {
-    drawDig(minutes / 10, x + 8, y);
-    digs[2] = minutes / 10;
+    new_digs[2] = minutes / 10;
+    mult_progress = true;
   }
   if (minutes % 10 != digs[3]) {
-    drawDig(minutes % 10, x + 12, y);
-    digs[3] = minutes % 10;
+    new_digs[3] = minutes % 10;
+    mult_progress = true;
   }
   
   // Управление подсветкой
@@ -508,14 +538,14 @@ void clockTick() {
     if (secs > 59) {      // каждую минуту
       secs = 0;
       mins++;
-      if (mins <= 59 && mode == 0) drawClock(hrs, mins, 0, 0, 1);
+      if (mins <= 59 && mode == 0) updateClock(hrs, mins, CLOCK_X, CLOCK_Y, 1);
     }
     if (mins > 59) {      // каждый час
       now = rtc.now();
       secs = now.second();
       mins = now.minute();
       hrs = now.hour();
-      if (mode == 0) drawClock(hrs, mins, 0, 0, 1);
+      if (mode == 0) updateClock(hrs, mins, CLOCK_X, CLOCK_Y, 1);
       if (hrs > 23) {
         hrs = 0;
       }
